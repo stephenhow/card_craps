@@ -177,7 +177,7 @@ int main(int argc, const char * argv[])
         history[wp].copyFrom(roll);
         wp = (wp+1)%window_size;
         if ((point == 0) && games%1000000 == 0) {
-            printf("games: %ld, pass flat: %+6.4f, pass10x: %+6.4f, pass w/count: %+6.4f, dont flat: %+6.4f, dont10x: %+6.4f, dont w/count: %+6.4f\n",
+            printf("%ld games:\npass flat: %+6.4f, pass10x: %+6.4f, pass w/count: %+6.4f,\ndont flat: %+6.4f, dont10x: %+6.4f, dont w/count: %+6.4f\n",
                    games,
                    pass0x/(double)games, pass10x/(double)games, passVarOdds/(double)games,
                    dont0x/(double)games, dont10x/(double)games, dontVarOdds/(double)games);
