@@ -14,9 +14,9 @@
 #define MAX_ODDS 10
 
 void usage() {
-    printf("cardcraps [-m minBufferDepth] [-d|-c|-s] [-v] \n");
+    printf("cardcraps [-m minBufferDepth] [-d|-c|-s] [-v] [-w countWindowRolls]\n");
 	printf("set minBufferDepth as first argument\n");
-	printf("e.g., cardcraps -m 16 -c\n");
+	printf("v: verbose (print point stats)\n");
 }
 
 void addStats(double value, int count, map<int,Averager> &stats) {
@@ -37,7 +37,7 @@ void printStats(map<int,Averager> &stats) {
 
 int main(int argc, const char * argv[])
 {
-    int sets=52, depth=0, window_size=6;
+    int sets=52, depth=14, window_size=6;
     int c;
     Dice *dice;
     bool verbose=false;
@@ -66,6 +66,7 @@ int main(int argc, const char * argv[])
 		usage();
 		exit(2);
 	}
+	printf("using window size of %d rolls\n", window_size);
     // stats
     unsigned long games=0, rolls=0;
     Roll roll;
