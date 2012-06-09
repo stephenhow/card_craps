@@ -51,11 +51,11 @@ int main(int argc, const char * argv[])
 				break;
             case 'c':
 				dice = new CSMDice(sets,depth);
-				printf("using CSM with %d dice sets, and minBufferDepth %d\n", sets, depth);
+				printf("using CSM with %d dice sets, and minBufferDepth of %d cards\n", sets, depth);
 				break;
             case 's':
 				dice = new CSM126Dice(sets,depth);
-				printf("using model of ShuffleMaster 128 CSM with %d dice sets, and minBufferDepth %d\n", sets, depth);
+				printf("using model of ShuffleMaster 126 CSM with %d dice sets, and minBufferDepth of %d cards\n", sets, depth);
 				break;
             case 'v': verbose = true; break;
             case 'w': window_size = atoi(optarg); break;
