@@ -194,6 +194,10 @@ int main(int argc, const char * argv[])
             }
         }
         dice->muckRoll(roll);
+		if (false && !dice->countdown()) {
+			printf("roll: %ld\n", rolls);
+			exit(-1);
+		}
         rolls++;
     }
     

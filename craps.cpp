@@ -19,6 +19,10 @@ void Roll::setDie(int d1, int d2) {
     die2 = d2;
 }
 
+bool Roll::isValid() {
+	return !((die1<=0) || (die1>6) || (die2<=0) || (die2>6));
+}
+
 int Roll::getValue() {
     return die1+die2;
 }
@@ -89,12 +93,18 @@ Dice::Dice() {}
 
 void Dice::getRoll(Roll &roll) {
     int d1, d2;
-    d1 = 1 + 6*(double)(rand()%RAND_MAX)/(double)RAND_MAX;
-    d2 = 1 + 6*(double)(rand()%RAND_MAX)/(double)RAND_MAX;
+    d1 = 1 + 6*((double)rand()/(double)RAND_MAX);
+    d2 = 1 + 6*((double)rand()/(double)RAND_MAX);
+	if (d1>=6) d1=6;
+	if (d2>=6) d2=6;
     roll.setDie(d1, d2);
 }
 
 void Dice::muckRoll(Roll &roll) {}
+
+bool Dice::countdown() {
+	return true;
+}
 
 CSMDice::CSMDice(int sets, int minDepth) {
     minBufferDepth = minDepth;
@@ -103,23 +113,51 @@ CSMDice::CSMDice(int sets, int minDepth) {
             reservoir.push_back(j);
         }
     }
+	this->sets = sets;
     random_shuffle(reservoir.begin(), reservoir.end());
 }
 
 void CSMDice::getRoll(Roll &roll) {
-    if (buffer.size() < (2+minBufferDepth)) {
-        int numCards = minBufferDepth+2-buffer.size();
-        buffer.insert(buffer.end(), reservoir.begin(), reservoir.begin()+numCards);
-        reservoir.erase(reservoir.begin(), reservoir.begin()+numCards);
-    }
+	int pos;
+	while (buffer.size() < 2+minBufferDepth) {
+		pos = reservoir.size()*((double)rand()/(double)RAND_MAX);
+		if (pos >= reservoir.size()) pos = reservoir.size()-1;
+		buffer.insert(buffer.end(), reservoir[pos]);
+		reservoir.erase(reservoir.begin()+pos);
+	}
     roll.setDie(buffer[0], buffer[1]);
     buffer.erase(buffer.begin(),buffer.begin()+2);
+	if (!roll.isValid()) {
+		printf("invalid roll\n");
+		exit(-1);
+	}
 }
 
 void CSMDice::muckRoll(Roll &roll) {
+	if (!roll.isValid()) {
+		printf("muckRoll invalid roll\n");
+		exit(-1);
+	}
     reservoir.push_back(roll.getDie1());
     reservoir.push_back(roll.getDie2());
-    random_shuffle(reservoir.begin(), reservoir.end());
+    //random_shuffle(reservoir.begin(), reservoir.end());
+}
+
+bool CSMDice::countdown() {
+	int count[7];
+	for (int i=1; i<=6; i++) count[i] = 0;
+	for (vector<int>::iterator iter=reservoir.begin(); iter!=reservoir.end(); iter++) {
+		count[*iter]++;
+	}
+	for (vector<int>::iterator iter=buffer.begin(); iter!=buffer.end(); iter++) {
+		count[*iter]++;
+	}
+	bool valid=true;
+	for (int i=1; i<=6; i++) {
+		//printf("%d: %d\n", i, count[i]);
+		valid &= (count[i] == sets);
+	}
+	return valid;
 }
 
 CSM126Dice::CSM126Dice(int sets, int minDepth) : CSMDice(sets, minDepth) {
@@ -132,11 +170,14 @@ CSM126Dice::CSM126Dice(int sets, int minDepth) : CSMDice(sets, minDepth) {
 
 void CSM126Dice::muckCard(int card) {
     int slotNum, pos;
-    slotNum = NUM_SLOTS*(double)(rand()%RAND_MAX)/(double)RAND_MAX;
+    slotNum = NUM_SLOTS*((double)rand()/(double)RAND_MAX);
+	if (slotNum >= NUM_SLOTS) slotNum = NUM_SLOTS-1;
     while (slots[slotNum].size() > MAX_CARDS_PER_SLOT) {
-        slotNum = NUM_SLOTS*(double)(rand()%RAND_MAX)/(double)RAND_MAX;
+        slotNum = NUM_SLOTS*((double)rand()/(double)RAND_MAX);
+		if (slotNum >= NUM_SLOTS) slotNum = NUM_SLOTS-1;
     }
-    pos = slots[slotNum].size()*(double)(rand()%RAND_MAX)/(double)RAND_MAX;
+    pos = slots[slotNum].size()*((double)rand()/(double)RAND_MAX);
+	if (pos >= slots[slotNum].size()) pos = slots[slotNum].size()-1;
     slots[slotNum].insert(slots[slotNum].begin()+pos,card);
 }
 
@@ -149,7 +190,8 @@ void CSM126Dice::getRoll(Roll &roll) {
 }
 
 void CSM126Dice::dropSlot() {
-    int slotNum = NUM_SLOTS*(double)(rand()%RAND_MAX)/(double)RAND_MAX;
+    int slotNum = NUM_SLOTS*((double)rand()/(double)RAND_MAX);
+	if (slotNum >= NUM_SLOTS) slotNum = NUM_SLOTS-1;
     buffer.insert(buffer.end(), slots[slotNum].begin(), slots[slotNum].end());
     slots[slotNum].clear();
 }
@@ -157,4 +199,8 @@ void CSM126Dice::dropSlot() {
 void CSM126Dice::muckRoll(Roll &roll) {
     muckCard(roll.getDie1());
     muckCard(roll.getDie2());
+}
+
+bool CSM126Dice::countdown() {
+	return true;
 }

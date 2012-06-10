@@ -28,6 +28,7 @@ public:
     int countValue(int);
     int getDie1();
     int getDie2();
+	bool isValid();
 };
 
 class Dice {
@@ -35,6 +36,7 @@ public:
     Dice();
     virtual void getRoll(Roll&);
     virtual void muckRoll(Roll&);
+	virtual bool countdown();
 };
 
 class CSMDice : public Dice {
@@ -42,10 +44,12 @@ protected:
     vector<int> buffer;
     vector<int> reservoir;
     int minBufferDepth;
+	int sets;
 public:
     CSMDice(int sets, int minDepth);
     virtual void getRoll(Roll&);
     virtual void muckRoll(Roll&);
+	virtual bool countdown();
 };
 
 #define NUM_SLOTS 40
@@ -60,6 +64,7 @@ public:
     CSM126Dice(int sets, int minDepth);
     virtual void getRoll(Roll&);
     virtual void muckRoll(Roll&);
+	virtual bool countdown();
 };
 
 class Averager {
