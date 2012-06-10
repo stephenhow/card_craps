@@ -93,10 +93,8 @@ Dice::Dice() {}
 
 void Dice::getRoll(Roll &roll) {
     int d1, d2;
-    d1 = 1 + 6*((double)rand()/(double)RAND_MAX);
-    d2 = 1 + 6*((double)rand()/(double)RAND_MAX);
-	if (d1>=6) d1=6;
-	if (d2>=6) d2=6;
+    d1 = 1 + 6*random.genrand64_real2();
+    d2 = 1 + 6*random.genrand64_real2();
     roll.setDie(d1, d2);
 }
 

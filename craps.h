@@ -10,6 +10,7 @@
 #define CRAPS_H
 
 #include <vector>
+#include "mersenne64.h"
 
 using namespace std;
 
@@ -32,6 +33,8 @@ public:
 };
 
 class Dice {
+protected:
+	Mersenne64 random;
 public:
     Dice();
     virtual void getRoll(Roll&);

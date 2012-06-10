@@ -66,6 +66,7 @@ int main(int argc, const char * argv[])
 		usage();
 		exit(2);
 	}
+	srand(time(NULL));
 	printf("using window size of %d rolls\n", window_size);
     // stats
     unsigned long games=0, rolls=0;
@@ -193,7 +194,7 @@ int main(int argc, const char * argv[])
                 printf("\n");
             }
         }
-        dice->muckRoll(roll);
+		dice->muckRoll(roll);
 		if (false && !dice->countdown()) {
 			printf("roll: %ld\n", rolls);
 			exit(-1);
