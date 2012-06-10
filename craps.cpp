@@ -89,7 +89,10 @@ double Averager::getValue() {
     return total/(double)samples;
 }
 
-Dice::Dice() {}
+Dice::Dice() {
+	unsigned long long init[4]={0x12345ULL, 0x23456ULL, 0x34567ULL, 0x45678ULL}, length=4;
+    random.init_by_array64(init, length);
+}
 
 void Dice::getRoll(Roll &roll) {
     int d1, d2;
@@ -104,7 +107,7 @@ bool Dice::countdown() {
 	return true;
 }
 
-CSMDice::CSMDice(int sets, int minDepth) {
+CSMDice::CSMDice(int sets, int minDepth) : Dice() {
     minBufferDepth = minDepth;
     for (int i=0; i<sets; i++) {
         for (int j=1; j<=6; j++) {
@@ -112,14 +115,12 @@ CSMDice::CSMDice(int sets, int minDepth) {
         }
     }
 	this->sets = sets;
-    random_shuffle(reservoir.begin(), reservoir.end());
 }
 
 void CSMDice::getRoll(Roll &roll) {
 	int pos;
 	while (buffer.size() < 2+minBufferDepth) {
-		pos = reservoir.size()*((double)rand()/(double)RAND_MAX);
-		if (pos >= reservoir.size()) pos = reservoir.size()-1;
+		pos = reservoir.size()*random.genrand64_real2();
 		buffer.insert(buffer.end(), reservoir[pos]);
 		reservoir.erase(reservoir.begin()+pos);
 	}
@@ -138,7 +139,6 @@ void CSMDice::muckRoll(Roll &roll) {
 	}
     reservoir.push_back(roll.getDie1());
     reservoir.push_back(roll.getDie2());
-    //random_shuffle(reservoir.begin(), reservoir.end());
 }
 
 bool CSMDice::countdown() {
@@ -168,14 +168,11 @@ CSM126Dice::CSM126Dice(int sets, int minDepth) : CSMDice(sets, minDepth) {
 
 void CSM126Dice::muckCard(int card) {
     int slotNum, pos;
-    slotNum = NUM_SLOTS*((double)rand()/(double)RAND_MAX);
-	if (slotNum >= NUM_SLOTS) slotNum = NUM_SLOTS-1;
+    slotNum = NUM_SLOTS*random.genrand64_real2();
     while (slots[slotNum].size() > MAX_CARDS_PER_SLOT) {
-        slotNum = NUM_SLOTS*((double)rand()/(double)RAND_MAX);
-		if (slotNum >= NUM_SLOTS) slotNum = NUM_SLOTS-1;
+        slotNum = NUM_SLOTS*random.genrand64_real2();
     }
-    pos = slots[slotNum].size()*((double)rand()/(double)RAND_MAX);
-	if (pos >= slots[slotNum].size()) pos = slots[slotNum].size()-1;
+    pos = slots[slotNum].size()*random.genrand64_real2();
     slots[slotNum].insert(slots[slotNum].begin()+pos,card);
 }
 
@@ -188,8 +185,7 @@ void CSM126Dice::getRoll(Roll &roll) {
 }
 
 void CSM126Dice::dropSlot() {
-    int slotNum = NUM_SLOTS*((double)rand()/(double)RAND_MAX);
-	if (slotNum >= NUM_SLOTS) slotNum = NUM_SLOTS-1;
+    int slotNum = NUM_SLOTS*random.genrand64_real2();
     buffer.insert(buffer.end(), slots[slotNum].begin(), slots[slotNum].end());
     slots[slotNum].clear();
 }
